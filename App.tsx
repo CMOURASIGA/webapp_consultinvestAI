@@ -58,9 +58,9 @@ import {
   BarChart2,
   Bell
 } from 'lucide-react';
-import { 
-  WizardData, 
-  Simulation, 
+import {
+  WizardData,
+  Simulation,
   AIConfig,
   MarketPanoramaOutput,
   RiskProfile,
@@ -78,6 +78,15 @@ const DEFAULT_AI_CONFIG: AIConfig = {
   temperature: 0.7,
   apiKey: ''
 };
+
+type UserLevel = 'iniciante' | 'intermediario' | 'avancado';
+const USER_LEVEL_KEY = 'reserveAdvisor:userLevel';
+const loadUserLevel = (): UserLevel => {
+  const stored = localStorage.getItem(USER_LEVEL_KEY) as UserLevel | null;
+  if (stored === 'iniciante' || stored === 'intermediario' || stored === 'avancado') return stored;
+  return 'intermediario';
+};
+const saveUserLevel = (level: UserLevel) => localStorage.setItem(USER_LEVEL_KEY, level);
 
 const ENGINE_VERSION = {
   label: 'Modelo de Analise',
@@ -149,6 +158,9 @@ const GLOSSARY_TERMS = [
 
 const Header = () => {
   const [showConfig, setShowConfig] = useState(false);
+  const [userLevel, setUserLevel] = useState<UserLevel>(() => {
+    try { return loadUserLevel(); } catch { return 'intermediario'; }
+  });
   const normalizeModel = (provider: LLMProvider, model: string) => {
     if (provider === 'Google AI Studio (Gemini)') {
       if (model === 'gemini-2.5-flash-latest') return 'gemini-2.5-flash';
@@ -169,6 +181,10 @@ const Header = () => {
   useEffect(() => {
     localStorage.setItem('reserveAdvisor:aiConfig', JSON.stringify(config));
   }, [config]);
+
+  useEffect(() => {
+    try { saveUserLevel(userLevel); } catch {}
+  }, [userLevel]);
 
   const handleProviderChange = (provider: LLMProvider) => {
     const defaultConfig = AVAILABLE_MODELS[provider][0];
@@ -259,6 +275,26 @@ const Header = () => {
                           </button>
                         ))}
                       </div>
+                   </div>
+
+                   <div className="space-y-6 pt-4 border-t border-white/5">
+                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Nível do usuário</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { id: 'iniciante', label: 'Iniciante' },
+                          { id: 'intermediario', label: 'Intermediário' },
+                          { id: 'avancado', label: 'Avançado' },
+                        ].map(level => (
+                          <button
+                            key={level.id}
+                            onClick={() => setUserLevel(level.id as UserLevel)}
+                            className={`px-3 py-3 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${userLevel === level.id ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'bg-white/5 border-transparent text-gray-500 hover:bg-white/10'}`}
+                          >
+                            {level.label}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-gray-500 font-medium leading-relaxed">Mais explicação para iniciantes, mais dados para avançados. Mesmo cuidado legal.</p>
                    </div>
                    <div className="pt-4 border-t border-white/5">
                       <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noopener noreferrer" className="text-[10px] text-emerald-400 font-bold flex items-center gap-2 hover:underline">
@@ -546,6 +582,7 @@ const DashboardPage = () => {
   const [alertFrequency, setAlertFrequency] = useState<string>(() => {
     return localStorage.getItem('reserveAdvisor:alertFrequency') || 'mensal';
   });
+  const userLevel = (() => { try { return loadUserLevel(); } catch { return 'intermediario'; } })();
 
   const CACHE_KEY = (c: string) => `reserveAdvisor:panorama:${c}`;
 
@@ -696,7 +733,7 @@ const DashboardPage = () => {
         </div>
       )}
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div className="space-y-2">
            <h1 className="text-5xl font-black text-[#0d3b4c] tracking-tighter uppercase leading-none">PANORAMA DE MERCADO</h1>
            <div className="text-gray-400 font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
@@ -713,6 +750,7 @@ const DashboardPage = () => {
              <Link to="/glossary" className="px-3 py-1 rounded-full bg-white border border-gray-100 text-[#0d3b4c] hover:border-emerald-200 transition">Risco</Link>
              <Link to="/glossary" className="px-3 py-1 rounded-full bg-white border border-gray-100 text-[#0d3b4c] hover:border-emerald-200 transition">Diversificação</Link>
              <Link to="/glossary" className="px-3 py-1 rounded-full bg-white border border-gray-100 text-[#0d3b4c] hover:border-emerald-200 transition">Volatilidade</Link>
+              <span className="text-gray-400">Linguagem: {userLevel === 'iniciante' ? 'Explicativa' : userLevel === 'avancado' ? 'Dados rápidos' : 'Balanceada'}</span>
            </div>
         </div>
         <div className="bg-white border border-gray-100 p-1 rounded-2xl flex gap-1 shadow-sm">
@@ -1145,6 +1183,7 @@ const ResultsPage = () => {
     <div className="max-w-5xl mx-auto py-20 px-6 space-y-12 animate-in fade-in">
       <div className="bg-white p-16 rounded-[64px] shadow-2xl border border-gray-50">
         <h1 className="text-5xl font-black text-[#0d3b4c] uppercase tracking-tighter mb-8">Diagnóstico de Reserva</h1>
+        <p className="text-sm text-gray-500 font-medium mb-4">Linguagem adaptada: {(() => { const lvl = (() => { try { return loadUserLevel(); } catch { return 'intermediario'; } })(); return lvl === 'iniciante' ? 'mais explicações' : lvl === 'avancado' ? 'mais dados, menos texto' : 'balanceado'; })()}</p>
         {hasSummary && (
           <div className="bg-emerald-50 p-8 rounded-[32px] mb-12 border border-emerald-100">
             <p className="text-gray-600 font-medium italic leading-relaxed">{sim.results.summary}</p>
