@@ -1435,18 +1435,18 @@ const HistoryPage = () => {
 
 const HowItWorksPage = () => (
   <div className="max-w-6xl mx-auto py-20 px-6 space-y-12">
-    <div className="space-y-3 text-center">
-      <div className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500">Governança e Transparência</div>
-      <h1 className="text-5xl font-black text-[#0d3b4c] uppercase tracking-tighter">Como o Reserve Advisor funciona</h1>
-      <div className="text-sm text-gray-500 font-semibold uppercase tracking-[0.2em]">Modelo de Análise v1.0 — Atualizado em 05/02/2026</div>
-    </div>
+      <div className="space-y-3 text-center">
+        <div className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500">Governança e Transparência</div>
+        <h1 className="text-5xl font-black text-[#0d3b4c] uppercase tracking-tighter">Como o Reserve Advisor funciona</h1>
+        <div className="text-sm text-gray-500 font-semibold uppercase tracking-[0.2em]">Modelo de Análise v1.0 — Atualizado em 05/02/2026</div>
+      </div>
 
     <div className="grid md:grid-cols-2 gap-6">
       <div className="bg-white p-8 rounded-[28px] border border-gray-100 shadow-sm space-y-3">
         <div className="flex items-center gap-3 text-emerald-500 font-black uppercase text-[11px] tracking-[0.3em]">
           <Radar size={16} /> Origem dos Dados
         </div>
-        <p className="text-sm text-gray-600">Mercado em tempo real via provedores de IA configurados (ex.: OpenAI/Gemini) com prompts estruturados em JSON. Nenhuma decisão é tomada sem a resposta do provedor.</p>
+        <p className="text-sm text-gray-600">Mercado em tempo real via provedores de IA configurados (ex.: OpenAI/Gemini) com prompts estruturados para analise de investimento. Nenhuma decisão é tomada sem a resposta do provedor.</p>
       </div>
       <div className="bg-white p-8 rounded-[28px] border border-gray-100 shadow-sm space-y-3">
         <div className="flex items-center gap-3 text-indigo-500 font-black uppercase text-[11px] tracking-[0.3em]">
