@@ -134,17 +134,17 @@ const AVAILABLE_MODELS: {[key in LLMProvider]: {id: string, name: string, desc: 
 };
 
 const GLOSSARY_TERMS = [
-  { id: 'mentoria-ai', title: 'Mentoria Educacional', category: 'Sistema', whatIs: 'O sistema utiliza IA para explicar o "porquê" de cada alocação, transformando números em conhecimento prático e estratégico para o usuário.', icon: <Lightbulb className="text-amber-500" /> },
-  { id: 'panorama-realtime', title: 'Panorama em Tempo Real', category: 'Sistema', whatIs: 'Monitoramento ativo do mercado via Google Search, trazendo taxas de juros, Inflação e variAções de ativos atualizadas para o dia de hoje.', icon: <Radar className="text-emerald-500" /> },
-  { id: 'simulacao-dinamica', title: 'Simulação Dinâmica', category: 'Sistema', whatIs: 'Diferente de calculadoras estáticas, nossa Simulação analisa seu perfil, objetivos e o mercado atual para criar um plano de alocação único.', icon: <Sparkles className="text-indigo-500" /> },
-  { id: 'renda-fixa', title: 'Renda Fixa (CDB/LCI/LCA)', category: 'Produto', whatIs: 'Títulos emitidos por bancos ou empresas com rendimento previsível. LCI/LCA podem ser isentos de IR, CDB costuma ter FGC até o limite vigente.', icon: <Shield className="text-emerald-500" /> },
-  { id: 'tesouro', title: 'Tesouro Selic e Tesouro IPCA+', category: 'Produto', whatIs: 'Títulos públicos. Selic prioriza Liquidez e menor oscilação; IPCA+ protege contra Inflação no médio/longo prazo, mas oscila mais no curto prazo.', icon: <Umbrella className="text-sky-500" /> },
-  { id: 'etfs', title: 'ETFs Diversificados', category: 'Produto', whatIs: 'Fundos de índice negociados em bolsa que replicam carteiras como Ibovespa, S&P 500 ou Nasdaq. Oferecem diversificação instantânea com baixo custo.', icon: <BarChart3 className="text-blue-500" /> },
-  { id: 'acoes', title: 'Ações/FIIs', category: 'Produto', whatIs: 'participação em empresas ou fundos imobiliários. Maior potencial de retorno e volatilidade. Recomendado para horizontes mais longos e perfis tolerantes a risco.', icon: <Activity className="text-rose-500" /> },
-  { id: 'cripto', title: 'Criptoativos', category: 'Produto', whatIs: 'Ativos digitais como BTC/ETH. Alta volatilidade e correlação própria. Deve ser parcela pequena e consciente do risco.', icon: <Coins className="text-purple-500" /> },
-  { id: 'Liquidez', title: 'Liquidez Diária', category: 'Conceito', whatIs: 'Capacidade de resgatar rapidamente sem perdas relevantes. Importante para reserva de Emergência e objetivos de curto prazo.', icon: <RefreshCcw className="text-teal-500" /> },
-  { id: 'diversificacao', title: 'diversificação', category: 'Conceito', whatIs: 'Distribuir o capital entre classes de ativos (Liquidez, estabilidade, crescimento) reduz risco específico e suaviza a jornada.', icon: <Layers className="text-amber-600" /> },
-  { id: 'volatilidade', title: 'Risco x Volatilidade', category: 'Conceito', whatIs: 'Volatilidade é a oscilação de preço; risco é a chance de perda permanente. Um ativo pode oscilar muito sem comprometer fundamentos de longo prazo.', icon: <AlertTriangle className="text-red-500" /> }
+  { id: 'mentoria-ai', title: 'Mentoria Educacional', category: 'Sistema', whatIs: 'IA para explicar o "porquê" de cada alocação, transformando números em conhecimento prático e estratégico.', useFor: 'Entender a lógica do plano sugerido.', impact: 'Você sabe o motivo de cada classe na carteira.', caution: 'Não substitui aconselhamento certificado.', icon: <Lightbulb className="text-amber-500" /> },
+  { id: 'panorama-realtime', title: 'Panorama em Tempo Real', category: 'Sistema', whatIs: 'Monitoramento via provedores para juros, Inflação e ativos.', useFor: 'Acompanhar o cenário antes de simular.', impact: 'Ajuste o plano conforme o contexto atual.', caution: 'Dados podem variar; sempre cheque a fonte.', icon: <Radar className="text-emerald-500" /> },
+  { id: 'simulacao-dinamica', title: 'Simulação Dinâmica', category: 'Sistema', whatIs: 'Analisa perfil, objetivos e mercado para gerar um plano único.', useFor: 'Testar combinações de perfil, prazo e liquidez.', impact: 'Mostra alocação alinhada ao seu risco.', caution: 'Não é recomendação formal.', icon: <Sparkles className="text-indigo-500" /> },
+  { id: 'renda-fixa', title: 'Renda Fixa (CDB/LCI/LCA)', category: 'Produto', whatIs: 'Títulos bancários ou de empresas com rendimento previsível.', useFor: 'Reserva, liquidez e estabilidade.', impact: 'Protege capital e suaviza oscilações.', caution: 'Cheque FGC e prazo de resgate.', icon: <Shield className="text-emerald-500" /> },
+  { id: 'tesouro', title: 'Tesouro Selic e Tesouro IPCA+', category: 'Produto', whatIs: 'Títulos públicos para liquidez (Selic) ou proteção contra Inflação (IPCA+).', useFor: 'Reserva (Selic) e proteção real (IPCA+).', impact: 'Equilibra liquidez e preservação do poder de compra.', caution: 'IPCA+ oscila mais no curto prazo.', icon: <Umbrella className="text-sky-500" /> },
+  { id: 'etfs', title: 'ETFs Diversificados', category: 'Produto', whatIs: 'Fundos de índice em bolsa (Ibovespa, S&P 500, Nasdaq).', useFor: 'Diversificar rápido com baixo custo.', impact: 'Exposição ampla com uma única posição.', caution: 'Segue o índice; volatilidade acompanha o mercado.', icon: <BarChart3 className="text-blue-500" /> },
+  { id: 'acoes', title: 'Ações/FIIs', category: 'Produto', whatIs: 'Participação em empresas ou fundos imobiliários.', useFor: 'Crescimento no longo prazo e renda (FIIs).', impact: 'Potencial de retorno maior, com mais oscilação.', caution: 'Adequar ao perfil e horizonte longo.', icon: <Activity className="text-rose-500" /> },
+  { id: 'cripto', title: 'Criptoativos', category: 'Produto', whatIs: 'Ativos digitais como BTC/ETH com alta volatilidade.', useFor: 'Parcela pequena e consciente de risco.', impact: 'Pode diversificar correlação, mas oscila muito.', caution: 'Use apenas se aceitar risco elevado.', icon: <Coins className="text-purple-500" /> },
+  { id: 'Liquidez', title: 'Liquidez Diária', category: 'Conceito', whatIs: 'Resgatar rápido sem perdas relevantes.', useFor: 'Reserva de emergência e objetivos de curto prazo.', impact: 'Diminui a chance de vender ativos voláteis em queda.', caution: 'Liquidez maior costuma ter retorno menor.', icon: <RefreshCcw className="text-teal-500" /> },
+  { id: 'diversificacao', title: 'Diversificação', category: 'Conceito', whatIs: 'Distribuir capital entre classes de ativos.', useFor: 'Reduzir risco específico e suavizar a jornada.', impact: 'Portfólio mais resiliente a choques.', caution: 'Diversificar não elimina risco de mercado.', icon: <Layers className="text-amber-600" /> },
+  { id: 'volatilidade', title: 'Risco x Volatilidade', category: 'Conceito', whatIs: 'Oscilação de preço vs. chance de perda permanente.', useFor: 'Entender quanto balanço a carteira pode ter.', impact: 'Ajuda a definir horizonte e liquidez necessários.', caution: 'Oscilar não é igual a perder para sempre.', icon: <AlertTriangle className="text-red-500" /> }
 ];
 
 const Header = () => {
@@ -706,6 +706,13 @@ const DashboardPage = () => {
              <span className="px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700">{ENGINE_VERSION.label}</span>
              <span className="px-3 py-1 rounded-xl bg-gray-50 border border-gray-100 text-gray-600">{ENGINE_VERSION.version}</span>
              <span className="px-3 py-1 rounded-xl bg-white border border-gray-100 text-gray-500">Atualizado em {ENGINE_VERSION.updatedAt}</span>
+           </div>
+           <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
+             <span className="text-gray-400">Glossário contextual:</span>
+             <Link to="/glossary" className="px-3 py-1 rounded-full bg-white border border-gray-100 text-[#0d3b4c] hover:border-emerald-200 transition">Reserva</Link>
+             <Link to="/glossary" className="px-3 py-1 rounded-full bg-white border border-gray-100 text-[#0d3b4c] hover:border-emerald-200 transition">Risco</Link>
+             <Link to="/glossary" className="px-3 py-1 rounded-full bg-white border border-gray-100 text-[#0d3b4c] hover:border-emerald-200 transition">Diversificação</Link>
+             <Link to="/glossary" className="px-3 py-1 rounded-full bg-white border border-gray-100 text-[#0d3b4c] hover:border-emerald-200 transition">Volatilidade</Link>
            </div>
         </div>
         <div className="bg-white border border-gray-100 p-1 rounded-2xl flex gap-1 shadow-sm">
@@ -1436,11 +1443,23 @@ const HowItWorksPage = () => (
 const GlossaryPage = () => (
   <div className="max-w-7xl mx-auto py-20 px-6 space-y-16">
     <h1 className="text-6xl font-black text-[#0d3b4c] uppercase tracking-tighter text-center">GLOSSÁRIO</h1>
+    <p className="text-center text-gray-500 font-medium">Aprenda enquanto usa: o que é, para que serve, impacto prático e atenções.</p>
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
       {GLOSSARY_TERMS.map(term => (
-        <div key={term.id} className="p-10 bg-white rounded-[48px] border border-gray-100 shadow-sm space-y-6">
-          <h3 className="font-black text-[#0d3b4c] uppercase mb-4">{term.title}</h3>
-          <p className="text-sm text-gray-500 font-medium leading-relaxed">{term.whatIs}</p>
+        <div key={term.id} className="p-10 bg-white rounded-[48px] border border-gray-100 shadow-sm space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-100">{term.icon}</div>
+            <div>
+              <h3 className="font-black text-[#0d3b4c] uppercase">{term.title}</h3>
+              <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">{term.category}</div>
+            </div>
+          </div>
+          <div className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <div><span className="font-bold text-[#0d3b4c]">O que é:</span> {term.whatIs}</div>
+            <div><span className="font-bold text-[#0d3b4c]">Para que serve:</span> {term.useFor}</div>
+            <div><span className="font-bold text-[#0d3b4c]">Impacto prático:</span> {term.impact}</div>
+            <div><span className="font-bold text-[#0d3b4c]">Atenções:</span> {term.caution}</div>
+          </div>
         </div>
       ))}
     </div>
