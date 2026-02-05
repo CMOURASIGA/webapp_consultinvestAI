@@ -533,10 +533,31 @@ const DashboardPage = () => {
   const [data, setData] = useState<MarketPanoramaOutput | null>(null);
   const [country, setCountry] = useState('Brasil');
   const [error, setError] = useState<string | null>(null);
+  const [cachedNotice, setCachedNotice] = useState<string | null>(null);
+
+  const CACHE_KEY = (c: string) => `reserveAdvisor:panorama:${c}`;
+
+  const saveCache = (c: string, payload: MarketPanoramaOutput) => {
+    try {
+      localStorage.setItem(CACHE_KEY(c), JSON.stringify({ asOf: Date.now(), payload }));
+    } catch {}
+  };
+
+  const loadCache = (c: string): MarketPanoramaOutput | null => {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY(c));
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed.payload as MarketPanoramaOutput;
+    } catch {
+      return null;
+    }
+  };
 
   const fetchData = async (targetCountry: string) => {
     setLoading(true);
     setError(null);
+    setCachedNotice(null);
     let aiConfig: AIConfig | null = null;
     try {
       const savedConfig = localStorage.getItem('reserveAdvisor:aiConfig');
@@ -546,12 +567,19 @@ const DashboardPage = () => {
       if (!res || !res.data) throw new Error('Panorama vazio retornado pela IA.');
       console.log('[Panorama][IA][Raw]', res.data);
       setData(res.data);
+      saveCache(targetCountry, res.data);
     } catch (e: any) {
       console.error(e);
       const prov = aiConfig?.provider || 'IA';
       const msg = e?.message || 'Erro ao buscar panorama.';
-      setError(`Não foi possível obter dados em tempo real com ${prov}. Detalhe: ${msg}`);
-      setData(null);
+      const cached = loadCache(targetCountry);
+      if (cached) {
+        setCachedNotice(`Mostrando dados em cache (último sucesso). Erro atual com ${prov}: ${msg}`);
+        setData(cached);
+      } else {
+        setError(`Não foi possível obter dados em tempo real com ${prov}. Detalhe: ${msg}`);
+        setData(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -580,6 +608,12 @@ const DashboardPage = () => {
         <div className="bg-red-50 text-red-800 border border-red-200 p-4 rounded-2xl text-sm font-semibold flex items-center justify-between">
           <span>{error}</span>
           <button onClick={() => fetchData(country)} className="px-4 py-2 text-xs font-black rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors">Tentar novamente</button>
+        </div>
+      )}
+      {cachedNotice && !error && (
+        <div className="bg-amber-50 text-amber-900 border border-amber-200 p-4 rounded-2xl text-sm font-semibold flex items-center justify-between">
+          <span>{cachedNotice}</span>
+          <button onClick={() => fetchData(country)} className="px-4 py-2 text-xs font-black rounded-xl bg-amber-600 text-white hover:bg-amber-700 transition-colors">Atualizar agora</button>
         </div>
       )}
       {/* Top Header */}
