@@ -1,4 +1,4 @@
-
+﻿
 import React, { useState, useEffect, useRef } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
 import { 
@@ -55,7 +55,8 @@ import {
   Key,
   Edit3,
   LockKeyhole,
-  BarChart2
+  BarChart2,
+  Bell
 } from 'lucide-react';
 import { 
   WizardData, 
@@ -110,11 +111,11 @@ const AVAILABLE_PROVIDERS: LLMProvider[] = [
 const AVAILABLE_MODELS: {[key in LLMProvider]: {id: string, name: string, desc: string}[]} = {
   'Google AI Studio (Gemini)': [
     { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', desc: 'O modelo mais capaz para tarefas complexas.' },
-    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', desc: 'Rápido e versátil para diversas aplicações.' },
+    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', desc: 'Rápido e versátil para diversas aplicAções.' },
   ],
   'OpenAI (ChatGPT)': [
     { id: 'gpt-4o', name: 'GPT-4o', desc: 'Modelo completo com suporte a JSON estruturado.' },
-    { id: 'gpt-4o-mini', name: 'GPT-4o Mini', desc: 'Versão mais leve e econômica com JSON nativo.' },
+    { id: 'gpt-4o-mini', name: 'GPT-4o Mini', desc: 'versão mais leve e econômica com JSON nativo.' },
     { id: 'gpt-4.1', name: 'GPT-4.1', desc: 'Modelo avançado; requer acesso habilitado na conta.' },
   ],
   'Anthropic (Claude)': [
@@ -122,7 +123,7 @@ const AVAILABLE_MODELS: {[key in LLMProvider]: {id: string, name: string, desc: 
     { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet', desc: 'Balanço ideal entre performance e custo.' },
   ],
   'Groq (Ultra Fast)': [
-    { id: 'llama3-8b-8192', name: 'LLaMA3 8b', desc: 'Resposta em tempo real, ultra rápido.' },
+    { id: 'llama3-8b-8192', name: 'LLaMA3 8b', desc: 'Resposta em tempo real, ultra Rápido.' },
   ],
   'DeepSeek (Open Model)': [
     { id: 'deepseek-coder', name: 'DeepSeek Coder', desc: 'Especializado em código.' },
@@ -134,15 +135,15 @@ const AVAILABLE_MODELS: {[key in LLMProvider]: {id: string, name: string, desc: 
 
 const GLOSSARY_TERMS = [
   { id: 'mentoria-ai', title: 'Mentoria Educacional', category: 'Sistema', whatIs: 'O sistema utiliza IA para explicar o "porquê" de cada alocação, transformando números em conhecimento prático e estratégico para o usuário.', icon: <Lightbulb className="text-amber-500" /> },
-  { id: 'panorama-realtime', title: 'Panorama em Tempo Real', category: 'Sistema', whatIs: 'Monitoramento ativo do mercado via Google Search, trazendo taxas de juros, inflação e variações de ativos atualizadas para o dia de hoje.', icon: <Radar className="text-emerald-500" /> },
-  { id: 'simulacao-dinamica', title: 'Simulação Dinâmica', category: 'Sistema', whatIs: 'Diferente de calculadoras estáticas, nossa simulação analisa seu perfil, objetivos e o mercado atual para criar um plano de alocação único.', icon: <Sparkles className="text-indigo-500" /> },
+  { id: 'panorama-realtime', title: 'Panorama em Tempo Real', category: 'Sistema', whatIs: 'Monitoramento ativo do mercado via Google Search, trazendo taxas de juros, Inflação e variAções de ativos atualizadas para o dia de hoje.', icon: <Radar className="text-emerald-500" /> },
+  { id: 'simulacao-dinamica', title: 'Simulação Dinâmica', category: 'Sistema', whatIs: 'Diferente de calculadoras estáticas, nossa Simulação analisa seu perfil, objetivos e o mercado atual para criar um plano de alocação único.', icon: <Sparkles className="text-indigo-500" /> },
   { id: 'renda-fixa', title: 'Renda Fixa (CDB/LCI/LCA)', category: 'Produto', whatIs: 'Títulos emitidos por bancos ou empresas com rendimento previsível. LCI/LCA podem ser isentos de IR, CDB costuma ter FGC até o limite vigente.', icon: <Shield className="text-emerald-500" /> },
-  { id: 'tesouro', title: 'Tesouro Selic e Tesouro IPCA+', category: 'Produto', whatIs: 'Títulos públicos. Selic prioriza liquidez e menor oscilação; IPCA+ protege contra inflação no médio/longo prazo, mas oscila mais no curto prazo.', icon: <Umbrella className="text-sky-500" /> },
+  { id: 'tesouro', title: 'Tesouro Selic e Tesouro IPCA+', category: 'Produto', whatIs: 'Títulos públicos. Selic prioriza Liquidez e menor oscilação; IPCA+ protege contra Inflação no médio/longo prazo, mas oscila mais no curto prazo.', icon: <Umbrella className="text-sky-500" /> },
   { id: 'etfs', title: 'ETFs Diversificados', category: 'Produto', whatIs: 'Fundos de índice negociados em bolsa que replicam carteiras como Ibovespa, S&P 500 ou Nasdaq. Oferecem diversificação instantânea com baixo custo.', icon: <BarChart3 className="text-blue-500" /> },
-  { id: 'acoes', title: 'Ações/FIIs', category: 'Produto', whatIs: 'Participação em empresas ou fundos imobiliários. Maior potencial de retorno e volatilidade. Recomendado para horizontes mais longos e perfis tolerantes a risco.', icon: <Activity className="text-rose-500" /> },
+  { id: 'acoes', title: 'Ações/FIIs', category: 'Produto', whatIs: 'participação em empresas ou fundos imobiliários. Maior potencial de retorno e volatilidade. Recomendado para horizontes mais longos e perfis tolerantes a risco.', icon: <Activity className="text-rose-500" /> },
   { id: 'cripto', title: 'Criptoativos', category: 'Produto', whatIs: 'Ativos digitais como BTC/ETH. Alta volatilidade e correlação própria. Deve ser parcela pequena e consciente do risco.', icon: <Coins className="text-purple-500" /> },
-  { id: 'liquidez', title: 'Liquidez Diária', category: 'Conceito', whatIs: 'Capacidade de resgatar rapidamente sem perdas relevantes. Importante para reserva de emergência e objetivos de curto prazo.', icon: <RefreshCcw className="text-teal-500" /> },
-  { id: 'diversificacao', title: 'Diversificação', category: 'Conceito', whatIs: 'Distribuir o capital entre classes de ativos (liquidez, estabilidade, crescimento) reduz risco específico e suaviza a jornada.', icon: <Layers className="text-amber-600" /> },
+  { id: 'Liquidez', title: 'Liquidez Diária', category: 'Conceito', whatIs: 'Capacidade de resgatar rapidamente sem perdas relevantes. Importante para reserva de Emergência e objetivos de curto prazo.', icon: <RefreshCcw className="text-teal-500" /> },
+  { id: 'diversificacao', title: 'diversificação', category: 'Conceito', whatIs: 'Distribuir o capital entre classes de ativos (Liquidez, estabilidade, crescimento) reduz risco específico e suaviza a jornada.', icon: <Layers className="text-amber-600" /> },
   { id: 'volatilidade', title: 'Risco x Volatilidade', category: 'Conceito', whatIs: 'Volatilidade é a oscilação de preço; risco é a chance de perda permanente. Um ativo pode oscilar muito sem comprometer fundamentos de longo prazo.', icon: <AlertTriangle className="text-red-500" /> }
 ];
 
@@ -243,7 +244,7 @@ const Header = () => {
                    </div>
 
                    <div className="space-y-6 pt-4 border-t border-white/5">
-                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Engine de Inteligência</label>
+                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Engine de inteligência</label>
                       <div className="grid grid-cols-1 gap-3">
                         {AVAILABLE_MODELS[config.provider].map(m => (
                           <button key={m.id} onClick={() => setConfig({ ...config, model: m.id })} className={`w-full text-left p-6 rounded-2xl border-2 transition-all flex justify-between items-center ${config.model === m.id ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'bg-white/5 border-transparent text-gray-500 hover:bg-white/10'}`}>
@@ -307,7 +308,7 @@ const WizardPage = () => {
 
   const prettifyAIError = (err: any, provider?: string) => {
     const providerLabel = provider || 'IA';
-    const raw = err?.message || err?.toString?.() || 'Erro desconhecido ao processar simulação.';
+    const raw = err?.message || err?.toString?.() || 'Erro desconhecido ao processar Simulação.';
     const tryJson = (text: string) => {
       try { return JSON.parse(text); } catch { return null; }
     };
@@ -327,7 +328,7 @@ const WizardPage = () => {
       return `Limite de uso da API atingido. Verifique cotas/billing do provedor (${providerLabel}) ou aguarde e tente novamente.`;
     }
     if (code === 404 || /not found/i.test(msg)) {
-      return 'Modelo não encontrado no provedor. Confirme o modelo selecionado (ex.: gemini-2.5-flash) e se ele está habilitado para sua chave.';
+      return 'Modelo Não encontrado no provedor. Confirme o modelo selecionado (ex.: gemini-2.5-flash) e se ele está habilitado para sua chave.';
     }
     return msg;
   };
@@ -343,14 +344,14 @@ const WizardPage = () => {
       currentAIConfig = aiConfig;
 
       if (!aiConfig.apiKey || !aiConfig.apiKey.trim()) {
-        throw new Error('Informe uma chave de API válida antes de gerar o diagnóstico.');
+        throw new Error('Informe uma chave de API válida antes de gerar o Diagnóstico.');
       }
 
       let aiService;
       try {
         aiService = getAIService(aiConfig.provider);
       } catch (provErr: any) {
-        throw new Error(provErr?.message || 'Provedor de IA ainda não implementado. Utilize "Google AI Studio (Gemini)" por enquanto.');
+        throw new Error(provErr?.message || 'Provedor de IA ainda Não implementado. Utilize "Google AI Studio (Gemini)" por enquanto.');
       }
 
       const marketData = getMarketData(formData.country);
@@ -373,7 +374,7 @@ const WizardPage = () => {
        </div>
        <div className="text-center space-y-2">
           <h2 className="text-3xl font-black text-[#0d3b4c] uppercase tracking-tighter">Processando Diagnóstico</h2>
-          <p className="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em]">Consultando Engine de Alocação Dinâmica...</p>
+          <p className="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em]">Consultando Engine de alocação Dinâmica...</p>
        </div>
     </div>
   );
@@ -396,7 +397,7 @@ const WizardPage = () => {
         <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-[28px] p-6 flex gap-3 items-start shadow-sm">
           <AlertTriangle size={24} className="mt-0.5 text-red-500" />
           <div className="space-y-1">
-            <div className="text-[10px] font-black uppercase tracking-[0.25em]">Não foi possível gerar o diagnóstico</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.25em]">Não foi possível gerar o Diagnóstico</div>
             <div className="text-sm font-semibold leading-relaxed">{error}</div>
           </div>
         </div>
@@ -459,7 +460,7 @@ const WizardPage = () => {
           <div className="space-y-12 animate-in fade-in slide-in-from-right-8 duration-500">
              <div className="space-y-4">
                 <h2 className="text-6xl font-black text-[#0d3b4c] uppercase tracking-tighter leading-none">Perfil de Risco</h2>
-                <p className="text-xl text-gray-400 font-medium">Como você lida com as oscilações naturais do mercado?</p>
+                <p className="text-xl text-gray-400 font-medium">Como você lida com as oscilAções naturais do mercado?</p>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {(['Conservador', 'Moderado', 'Arrojado'] as RiskProfile[]).map(profile => (
@@ -508,7 +509,7 @@ const WizardPage = () => {
              <div className="bg-amber-50 border border-amber-100 p-8 rounded-[32px] flex gap-6 items-start">
                 <AlertCircle className="text-amber-500 flex-shrink-0" size={24} />
                 <p className="text-xs text-amber-900/60 font-medium leading-relaxed">
-                   **Aviso Importante:** Esta simulação tem fins didáticos e educacionais. As recomendações são baseadas em algoritmos de IA e dados de mercado atuais, mas não constituem recomendação formal de compra/venda de ativos.
+                   **Aviso Importante:** Esta Simulação tem fins didáticos e educacionais. As recomendações são baseadas em algoritmos de IA e dados de mercado atuais, mas Não constituem recomendação formal de compra/venda de ativos.
                 </p>
              </div>
           </div>
@@ -541,6 +542,10 @@ const DashboardPage = () => {
   const [country, setCountry] = useState('Brasil');
   const [error, setError] = useState<string | null>(null);
   const [cachedNotice, setCachedNotice] = useState<string | null>(null);
+  const [previousSnapshot, setPreviousSnapshot] = useState<MarketPanoramaOutput | null>(null);
+  const [alertFrequency, setAlertFrequency] = useState<string>(() => {
+    return localStorage.getItem('reserveAdvisor:alertFrequency') || 'mensal';
+  });
 
   const CACHE_KEY = (c: string) => `reserveAdvisor:panorama:${c}`;
 
@@ -565,6 +570,8 @@ const DashboardPage = () => {
     setLoading(true);
     setError(null);
     setCachedNotice(null);
+    const previous = loadCache(targetCountry);
+    setPreviousSnapshot(previous);
     let aiConfig: AIConfig | null = null;
     try {
       const savedConfig = localStorage.getItem('reserveAdvisor:aiConfig');
@@ -596,6 +603,71 @@ const DashboardPage = () => {
     fetchData(country);
   }, [country]);
 
+  useEffect(() => {
+    localStorage.setItem('reserveAdvisor:alertFrequency', alertFrequency);
+  }, [alertFrequency]);
+
+  const buildAlerts = (current: MarketPanoramaOutput | null, previous: MarketPanoramaOutput | null) => {
+    const alerts: { title: string; detail: string; tone: 'warn' | 'info' }[] = [];
+    const currOverview = current?.market_overview || {};
+    const prevOverview = previous?.market_overview || {};
+
+    if (current?.general_warnings && current.general_warnings.length > 0) {
+      current.general_warnings.forEach((w) => alerts.push({ title: 'Alerta de cenário', detail: w, tone: 'warn' }));
+    }
+
+    if (prevOverview && currOverview) {
+      const rateDiff = typeof currOverview.interestRate === 'number' && typeof prevOverview.interestRate === 'number'
+        ? currOverview.interestRate - prevOverview.interestRate
+        : null;
+      if (rateDiff !== null && Math.abs(rateDiff) >= 0.25) {
+        alerts.push({
+          title: 'Alteração de juros',
+          detail: `Taxa mudou ${rateDiff > 0 ? 'para cima' : 'para baixo'}: ${prevOverview.interestRate}% → ${currOverview.interestRate}%.`,
+          tone: 'warn'
+        });
+      }
+
+      const inflDiff = typeof currOverview.inflation === 'number' && typeof prevOverview.inflation === 'number'
+        ? currOverview.inflation - prevOverview.inflation
+        : null;
+      if (inflDiff !== null && Math.abs(inflDiff) >= 0.2) {
+        alerts.push({
+          title: 'Alteração de inflação',
+          detail: `Inflação variou ${inflDiff > 0 ? 'para cima' : 'para baixo'}: ${prevOverview.inflation}% → ${currOverview.inflation}%.`,
+          tone: 'warn'
+        });
+      }
+
+      if (currOverview.volatility && prevOverview.volatility && currOverview.volatility !== prevOverview.volatility) {
+        alerts.push({
+          title: 'Mudança de volatilidade',
+          detail: `Volatilidade agora ${currOverview.volatility} (antes ${prevOverview.volatility}).`,
+          tone: 'info'
+        });
+      }
+    }
+
+    const highVol = (currOverview.volatility || '').toLowerCase().includes('alta');
+    if (highVol) {
+      alerts.push({
+        title: 'Revisar estratégia',
+        detail: 'Volatilidade elevada. Considere revisar a estratégia no próximo ciclo — sem urgência.',
+        tone: 'info'
+      });
+    }
+
+    if (alerts.length === 0) {
+      alerts.push({
+        title: 'Monitoramento ativo',
+        detail: `Nenhum alerta crítico. Seguimos acompanhando com frequência ${alertFrequency}.`,
+        tone: 'info'
+      });
+    }
+
+    return alerts;
+  };
+
   if (loading) return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-8 animate-in fade-in">
        <div className="relative">
@@ -625,10 +697,15 @@ const DashboardPage = () => {
       )}
       {/* Top Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div className="space-y-1">
+        <div className="space-y-2">
            <h1 className="text-5xl font-black text-[#0d3b4c] tracking-tighter uppercase leading-none">PANORAMA DE MERCADO</h1>
            <div className="text-gray-400 font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
              <Globe size={14}/> {country.toUpperCase()} • ATUALIZADO RECENTEMENTE
+           </div>
+           <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600">
+             <span className="px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700">{ENGINE_VERSION.label}</span>
+             <span className="px-3 py-1 rounded-xl bg-gray-50 border border-gray-100 text-gray-600">{ENGINE_VERSION.version}</span>
+             <span className="px-3 py-1 rounded-xl bg-white border border-gray-100 text-gray-500">Atualizado em {ENGINE_VERSION.updatedAt}</span>
            </div>
         </div>
         <div className="bg-white border border-gray-100 p-1 rounded-2xl flex gap-1 shadow-sm">
@@ -659,6 +736,7 @@ const DashboardPage = () => {
             const rendaFixa = sections.renda_fixa_em_destaque || [];
             const crip = sections.cripto_em_acompanhamento || [];
             const outros = sections.outros_temas || [];
+            const contextualAlerts = buildAlerts(data, previousSnapshot);
             return (
               <>
           {/* Hero Section Grid */}
@@ -708,7 +786,7 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Insights rápidos */}
+          {/* Insights Rápidos */}
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
@@ -751,6 +829,44 @@ const DashboardPage = () => {
             </div>
           </div>
 
+          {/* Monitoramento e Alertas */}
+          <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-3 text-emerald-500">
+                  <Bell size={18} />
+                  <h3 className="text-sm font-black text-[#0d3b4c] uppercase tracking-widest">Monitoramento e alertas inteligentes</h3>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">Acompanhamos cenário macro e risco sem pressionar decisões. Usar para revisar, não para agir agora.</p>
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                <span className="text-gray-500">Frequência:</span>
+                {['mensal', 'trimestral'].map(freq => (
+                  <button
+                    key={freq}
+                    onClick={() => setAlertFrequency(freq)}
+                    className={`px-4 py-2 rounded-xl border text-xs font-black uppercase transition-all ${alertFrequency === freq ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-gray-500 border-gray-200 hover:border-emerald-200'}`}
+                  >
+                    {freq === 'mensal' ? 'Mensal' : 'Trimestral'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              {contextualAlerts.map((alert, idx) => (
+                <div key={idx} className={`p-4 rounded-2xl border ${alert.tone === 'warn' ? 'border-amber-200 bg-amber-50' : 'border-emerald-100 bg-emerald-50/60'} flex gap-3`}>
+                  <div className={`p-2 rounded-xl ${alert.tone === 'warn' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                    {alert.tone === 'warn' ? <AlertTriangle size={16} /> : <Info size={16} />}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-[#0d3b4c]">{alert.title}</div>
+                    <p className="text-sm text-gray-700 leading-relaxed">{alert.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Ações em Acompanhamento */}
           <div className="space-y-8">
             <div className="flex items-center gap-3">
@@ -758,29 +874,46 @@ const DashboardPage = () => {
                <h2 className="text-xl font-black text-[#0d3b4c] uppercase tracking-tighter">Ações em Acompanhamento</h2>
             </div>
              {acoes.length === 0 ? (
-               <div className="text-sm text-gray-500">Sem ações retornadas pelo provedor.</div>
+               <div className="text-sm text-gray-500">Sem Ações retornadas pelo provedor.</div>
              ) : (
                <div className="grid md:grid-cols-3 gap-8">
                   {acoes.map((acao, i) => (
-                    <div key={i} className="bg-white p-8 rounded-[40px] border border-gray-50 shadow-lg space-y-6 hover:-translate-y-2 transition-all">
-                      <div className="flex justify-between items-start">
-                         <div>
-                            <h4 className="text-2xl font-black text-[#0d3b4c] leading-none">{acao.symbol}</h4>
-                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">{acao.name}</span>
-                         </div>
-                         <div className={`px-3 py-1 rounded-full text-[9px] font-black ${acao.variation && acao.variation >= 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
-                            {acao.variation >= 0 ? '+' : ''}{acao.variation}%
-                         </div>
+                    <div key={i} className="bg-white p-8 rounded-[40px] border border-gray-50 shadow-lg space-y-5 hover:-translate-y-2 transition-all">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="space-y-1">
+                          <h4 className="text-2xl font-black text-[#0d3b4c] leading-none">{acao.symbol}</h4>
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">{acao.name}</span>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <div className={`px-3 py-1 rounded-full text-[9px] font-black ${acao?.variation !== undefined && acao.variation >= 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                            {acao?.variation !== undefined ? `${acao.variation >= 0 ? '+' : ''}${acao.variation}%` : '—'}
+                          </div>
+                          <div className="text-[9px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1">
+                            <BarChart className="w-3 h-3" /> {acao.marketRelevance || 'Relevância não informada'}
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-500 font-medium leading-relaxed h-12 overflow-hidden">
-                         {acao.why_in_dashboard}
-                      </p>
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                         <div className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Risco: {acao.risk_note.slice(0, 60)}...</div>
-                         <div className="flex flex-col items-end">
-                            <span className="text-[7px] font-black text-gray-400 uppercase">Volatilidade</span>
-                            <span className="text-[8px] font-black text-[#0d3b4c] uppercase">{acao.volatility || "Média"} VOL</span>
-                         </div>
+
+                      <div className="space-y-2">
+                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Por que aqui?</div>
+                        <p className="text-sm text-gray-600 font-medium leading-relaxed min-h-[48px]">
+                          {acao.why_in_dashboard || 'Selecionado por volume, volatilidade e menções recentes.'}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                        <div className="flex items-center gap-2">
+                          <Activity size={12} className="text-emerald-500" /> Volatilidade: <span className="text-[#0d3b4c]">{acao.volatility || 'Média'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle size={12} className="text-amber-500" /> Risco: <span className="text-[#0d3b4c] truncate">{acao.risk_note || 'Não informado'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <TrendingUp size={12} className="text-sky-500" /> Variação: <span className="text-[#0d3b4c]">{acao?.variation !== undefined ? `${acao.variation}%` : '—'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <PieChart size={12} className="text-indigo-500" /> Critério: <span className="text-[#0d3b4c]">Volume & relevância</span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -798,7 +931,7 @@ const DashboardPage = () => {
                </div>
                 <div className="space-y-4">
                    {rendaFixa.map((rf, i) => (
-                     <div key={i} className="bg-white p-6 rounded-[32px] border border-gray-50 shadow-sm flex items-center justify-between group hover:border-emerald-500/30 transition-all">
+                     <div key={i} className="bg-white p-6 rounded-[32px] border border-gray-50 shadow-sm flex flex-col gap-4 group hover:border-emerald-500/30 transition-all">
                         <div className="flex items-center gap-6">
                            <div className="bg-gray-50 px-4 py-2 rounded-xl text-[9px] font-black text-emerald-500 uppercase tracking-tight">
                               {rf.type}
@@ -808,9 +941,14 @@ const DashboardPage = () => {
                               <div className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Taxa Referencial</div>
                            </div>
                         </div>
-                        <p className="text-[10px] text-gray-400 font-medium max-w-[200px] text-right">
-                           {rf.why_in_dashboard}
+                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Por que aqui?</div>
+                        <p className="text-[10px] text-gray-500 font-medium leading-relaxed">
+                           {rf.why_in_dashboard || 'Selecionado por estabilidade, Liquidez e cobertura do FGC quando aplicável.'}
                         </p>
+                        <div className="flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                          <span className="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">Liquidez: {rf.liquidity || '—'}</span>
+                          <span className="px-3 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-100">Benefício fiscal: {rf.tax_benefit || '—'}</span>
+                        </div>
                      </div>
                    ))}
                 </div>
@@ -825,22 +963,55 @@ const DashboardPage = () => {
                 <div className="grid grid-cols-2 gap-4">
                    {crip.map((cripto, i) => (
                      <div key={i} className="bg-[#050b0d] p-8 rounded-[40px] text-white shadow-xl space-y-6 relative overflow-hidden">
-                        <div className="absolute top-4 right-4 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Alta</div>
+                        <div className="absolute top-4 right-4 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">{cripto.volatility || 'Alta'}</div>
                         <div>
                            <div className="text-emerald-400 font-black text-sm uppercase">{cripto.symbol}</div>
                            <div className="text-3xl font-black mt-1">${cripto.price?.toLocaleString()}</div>
                         </div>
-                        <p className="text-[9px] text-gray-400 font-medium leading-tight">
-                           {cripto.risk_note}
-                        </p>
-                        <div className="text-[8px] font-black text-emerald-500 uppercase tracking-widest pt-4 border-t border-white/5">
-                           ALTA VOLATILIDADE
+                        <div className="space-y-2">
+                          <div className="text-[9px] font-black text-emerald-300 uppercase tracking-widest">Por que aqui?</div>
+                          <p className="text-[11px] text-gray-300 font-medium leading-tight min-h-[44px]">
+                            {cripto.risk_note || 'Ativo incluído pela relevância recente e perfil de risco.'}
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-[10px] font-black uppercase tracking-widest">
+                          <span className="bg-white/5 rounded-lg px-3 py-2 flex items-center justify-between">Relevância <span className="text-emerald-300">{cripto.marketRelevance || '—'}</span></span>
+                          <span className="bg-white/5 rounded-lg px-3 py-2 flex items-center justify-between">Volatilidade <span className="text-emerald-300">{cripto.volatility || 'Alta'}</span></span>
+                          <span className="bg-white/5 rounded-lg px-3 py-2 flex items-center justify-between">Variação <span className="text-emerald-300">{cripto?.variation !== undefined ? `${cripto.variation}%` : '—'}</span></span>
+                          <span className="bg-white/5 rounded-lg px-3 py-2 flex items-center justify-between">Preço spot <span className="text-emerald-300">${cripto.price?.toLocaleString() || '—'}</span></span>
                         </div>
                      </div>
                   ))}
                </div>
-            </div>
+             </div>
          </div>
+
+          {/* Temas Relevantes */}
+          {outros && outros.length > 0 && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <Lightbulb className="text-[#0d3b4c]" size={20} />
+                <h2 className="text-xl font-black text-[#0d3b4c] uppercase tracking-tighter">Temas Relevantes</h2>
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Critérios: volume • volatilidade • contexto macro</span>
+              </div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {outros.map((tema: any, idx: number) => {
+                  const title = typeof tema === 'string' ? tema : (tema?.title || tema?.topic || 'Tema em destaque');
+                  const reason = typeof tema === 'string' ? 'Sinal recorrente observado pelo modelo.' : (tema?.reason || tema?.why || 'Sinal recorrente observado pelo modelo.');
+                  return (
+                    <div key={idx} className="bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">Por que aqui?</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Macro + Relevância</span>
+                      </div>
+                      <p className="text-sm font-black text-[#0d3b4c] leading-snug">{title}</p>
+                      <p className="text-sm text-gray-600 leading-relaxed">{reason}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           </>
         );
       })()}
@@ -911,12 +1082,57 @@ const ChatPage = () => {
 const ResultsPage = () => {
   const { simulationId } = useParams<{ simulationId: string }>();
   const [sim, setSim] = useState<Simulation | null>(null);
+  const [advancedEnabled, setAdvancedEnabled] = useState(false);
   useEffect(() => { if (simulationId) localStorageRepository.getSimulationById(simulationId).then(setSim); }, [simulationId]);
+  useEffect(() => {
+    if (sim?.hasAdvancedOptIn) setAdvancedEnabled(true);
+  }, [sim]);
   if (!sim) return <div className="p-20 text-center uppercase font-black text-gray-400 animate-pulse">Carregando...</div>;
 
   const recommendations = sim.results?.recommendations || [];
   const alternatives = sim.results?.alternatives || [];
   const hasSummary = !!sim.results?.summary;
+  const adv = sim.results?.advancedAnalysis;
+
+  const investmentValue = sim.value?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const scenarioCards = [
+    {
+      id: 'base',
+      title: 'Cenário Base',
+      tone: 'info',
+      bullets: [
+        `Mantém rota atual com ${sim.riskProfile.toLowerCase()} de risco e volatilidade ${sim.volatilityAcceptance.toLowerCase()}.`,
+        'Juros estáveis; inflação controlada no horizonte definido.',
+        'Aportes recorrentes seguem o plano sem ajustes emergenciais.',
+      ],
+    },
+    {
+      id: 'adverso',
+      title: 'Cenário Adverso',
+      tone: 'warn',
+      bullets: [
+        'Choque de juros/inflação; ativos de risco sofrem mais (quedas temporárias).',
+        'Liquidez diária e proteção (FGC/Tesouro) amortecem parte da queda.',
+        'Revisar estratégia no próximo ciclo, sem executar venda forçada.',
+      ],
+    },
+    {
+      id: 'otimista',
+      title: 'Cenário Otimista',
+      tone: 'info',
+      bullets: [
+        'Queda gradual de juros; melhora de crédito e bolsa.',
+        'Rebalancear mantendo diversificação para não concentrar riscos.',
+        'Aproveitar prêmio de risco sem ultrapassar limite da carteira.',
+      ],
+    },
+  ];
+
+  const stressNotes = [
+    'Volatilidade: simula choques de curto prazo; reserve liquidez para 3-6 meses.',
+    'Juros: subida inesperada reduz renda variável, melhora carrego de renda fixa indexada.',
+    'Eventos externos: política/fiscal/commodities podem alterar correlação; diversifique classes.',
+  ];
 
   return (
     <div className="max-w-5xl mx-auto py-20 px-6 space-y-12 animate-in fade-in">
@@ -925,6 +1141,176 @@ const ResultsPage = () => {
         {hasSummary && (
           <div className="bg-emerald-50 p-8 rounded-[32px] mb-12 border border-emerald-100">
             <p className="text-gray-600 font-medium italic leading-relaxed">{sim.results.summary}</p>
+          </div>
+        )}
+
+        {/* Cenários e Stress Test */}
+        <div className="space-y-8 mb-12">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="text-2xl font-black text-[#0d3b4c] uppercase tracking-tight">Cenários & Stress Test</h2>
+              <p className="text-sm text-gray-500 font-medium mt-1">Visão consultiva para {investmentValue} {sim.currency} — foco em risco antes do retorno.</p>
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 border border-amber-100 px-3 py-2 rounded-lg">Não é call de trade</span>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {scenarioCards.map(card => (
+              <div key={card.id} className={`p-6 rounded-[28px] border ${card.tone === 'warn' ? 'border-amber-200 bg-amber-50' : 'border-emerald-100 bg-emerald-50/70'} space-y-3`}>
+                <div className="flex items-center gap-2 text-[#0d3b4c]">
+                  {card.tone === 'warn' ? <AlertTriangle size={16} className="text-amber-600" /> : <Shield size={16} className="text-emerald-600" />}
+                  <div className="text-sm font-black uppercase tracking-widest">{card.title}</div>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-700 leading-relaxed list-disc list-inside">
+                  {card.bullets.map((b, idx) => <li key={idx}>{b}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white border border-gray-100 rounded-[28px] p-6 shadow-sm">
+            <div className="flex items-center gap-2 text-[#0d3b4c] mb-2">
+              <Target size={16} className="text-emerald-600" />
+              <div className="text-sm font-black uppercase tracking-widest">Stress test conceitual</div>
+            </div>
+            <ul className="grid md:grid-cols-3 gap-3 text-sm text-gray-700 leading-relaxed list-disc list-inside">
+              {stressNotes.map((n, idx) => <li key={idx}>{n}</li>)}
+            </ul>
+          </div>
+
+          <div className="bg-gray-50 border border-gray-100 rounded-[28px] p-6">
+            <div className="flex items-center gap-2 text-[#0d3b4c] mb-2">
+              <Layers size={16} className="text-emerald-600" />
+              <div className="text-sm font-black uppercase tracking-widest">Por que cada classe está na alocação</div>
+            </div>
+            {recommendations.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-3">
+                {recommendations.map((rec, i) => (
+                  <div key={i} className="p-4 rounded-2xl bg-white border border-gray-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-black text-[#0d3b4c] uppercase">{rec.title}</h4>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{rec.allocationPercent ? `${rec.allocationPercent}%` : ''}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed">{rec.why || 'Mantém equilíbrio de liquidez, estabilidade e crescimento.'}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Aguardando justificativas do modelo.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Análise Avançada (Opt-in) */}
+        {adv && (
+          <div className="space-y-6 mb-12">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-black text-[#0d3b4c] uppercase tracking-tight">Análise Avançada (Opt-in)</h2>
+                <p className="text-sm text-gray-500 font-medium">Recursos consultivos adicionais; use com cautela e sem timing de mercado.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                  <AlertTriangle size={14} className="text-amber-500" /> Aviso explícito
+                </label>
+                <label className="flex items-center gap-2 text-sm font-semibold text-[#0d3b4c]">
+                  <input type="checkbox" className="w-5 h-5 accent-emerald-500" checked={advancedEnabled} onChange={e => setAdvancedEnabled(e.target.checked)} />
+                  Ativar Modo Avançado
+                </label>
+              </div>
+            </div>
+            {!advancedEnabled ? (
+              <div className="p-6 rounded-[24px] border border-amber-200 bg-amber-50 text-amber-800 text-sm font-medium">
+                Ative o modo avançado para ver exemplos de ativos, quantidades estimadas e faixas históricas. Não é recomendação nem convite a operar agora.
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Ativos exemplificativos */}
+                <div className="bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield size={16} className="text-emerald-600" />
+                    <div className="text-sm font-black uppercase tracking-widest text-[#0d3b4c]">Ativos exemplificativos</div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Ações • ETFs • Cripto</span>
+                  </div>
+                  {adv.examples_analyzed && adv.examples_analyzed.length > 0 ? (
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {adv.examples_analyzed.map((ex, idx) => (
+                        <div key={idx} className="p-4 rounded-2xl border border-gray-100 bg-gray-50">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="text-sm font-black text-[#0d3b4c] uppercase">{ex.symbol} • {ex.name}</div>
+                              <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">{ex.category}</div>
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{ex.volatility} VOL</span>
+                          </div>
+                          <div className="text-sm text-gray-600 mt-2">Preço aprox.: {ex.price ? `$${ex.price}` : '—'} • Liquidez {ex.liquidity} • Tendência {ex.trend}</div>
+                          <p className="text-sm text-gray-600 mt-1 leading-relaxed">Por que aqui: {ex.why_in_scope}</p>
+                          {ex.key_risks && ex.key_risks.length > 0 && (
+                            <ul className="mt-2 text-xs text-amber-700 space-y-1 list-disc list-inside">
+                              {ex.key_risks.map((r, i2) => <li key={i2}>{r}</li>)}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Modelo não enviou exemplos de ativos.</p>
+                  )}
+                </div>
+
+                {/* Conversão em valores */}
+                <div className="bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target size={16} className="text-emerald-600" />
+                    <div className="text-sm font-black uppercase tracking-widest text-[#0d3b4c]">Conversão em valores (dentro do risco)</div>
+                  </div>
+                  {adv.allocation_examples?.positions && adv.allocation_examples.positions.length > 0 ? (
+                    <div className="space-y-3">
+                      <div className="text-sm text-gray-600">Risco usado: {adv.allocation_examples.risk_amount_used?.toLocaleString() || '—'} • Nota: {adv.allocation_examples.important_note}</div>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        {adv.allocation_examples.positions.map((pos, idx) => (
+                          <div key={idx} className="p-4 rounded-2xl border border-gray-100 bg-gray-50">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-sm font-black text-[#0d3b4c] uppercase">{pos.symbol}</span>
+                              <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Estimado</span>
+                            </div>
+                            <div className="text-sm text-gray-700">Preço: {pos.estimated_unit_price ?? '—'} • Qtd: {pos.estimated_units ?? '—'} • Custo: {pos.estimated_cost ?? '—'}</div>
+                            <p className="text-sm text-gray-600 mt-1 leading-relaxed">{pos.notes}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Sem exemplos de conversão em valores.</p>
+                  )}
+                </div>
+
+                {/* Zonas de preço */}
+                <div className="bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <PieChart size={16} className="text-emerald-600" />
+                    <div className="text-sm font-black uppercase tracking-widest text-[#0d3b4c]">Zonas de preço (faixas históricas)</div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Nunca timing exato</span>
+                  </div>
+                  {adv.price_zones && adv.price_zones.length > 0 ? (
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {adv.price_zones.map((pz, idx) => (
+                        <div key={idx} className="p-4 rounded-2xl border border-gray-100 bg-gray-50">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-black text-[#0d3b4c] uppercase">{pz.symbol}</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{pz.dataConfidence}</span>
+                          </div>
+                          <div className="text-sm text-gray-700 mt-1">Faixa: {pz.range || '—'}</div>
+                          <p className="text-sm text-gray-600 leading-relaxed mt-1">{pz.explanation || 'Faixa histórica fornecida pelo modelo (sem indicação de ponto de entrada).'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Modelo não trouxe faixas históricas.</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -954,7 +1340,7 @@ const ResultsPage = () => {
           </div>
         ) : (
           <div className="p-10 bg-amber-50 border border-amber-200 rounded-[40px] text-amber-900 font-semibold">
-            O modelo não retornou recomendações em formato esperado. Tente gerar novamente ou usar outro modelo.
+            O modelo Não retornou recomendAções em formato esperado. Tente gerar novamente ou usar outro modelo.
           </div>
         )}
 
@@ -992,7 +1378,7 @@ const HistoryPage = () => {
           <Link key={s.id} to={`/results/${s.id}`} className="p-10 bg-white rounded-[40px] border border-gray-100 hover:border-emerald-500 transition-all shadow-sm flex justify-between items-center group">
               <div>
                 <div className="text-xl font-black text-[#0d3b4c] uppercase">{new Date(s.createdAt).toLocaleDateString()}</div>
-                <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">{s.value} {s.currency} • {s.riskProfile}</div>
+                <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">{s.value} {s.currency} â€¢ {s.riskProfile}</div>
               </div>
               <ChevronRight className="text-emerald-500 group-hover:translate-x-2 transition-transform" />
           </Link>
@@ -1021,7 +1407,7 @@ const HowItWorksPage = () => (
         <div className="flex items-center gap-3 text-indigo-500 font-black uppercase text-[11px] tracking-[0.3em]">
           <Cpu size={16} /> Regra de Negócio vs IA
         </div>
-        <p className="text-sm text-gray-600">Regras de negócio definem o cálculo de perfil, camadas de liquidez/estabilidade/crescimento e limites de risco. A IA é usada para explicar e detalhar as alocações em linguagem natural.</p>
+        <p className="text-sm text-gray-600">Regras de negócio definem o cálculo de perfil, camadas de Liquidez/estabilidade/crescimento e limites de risco. A IA é usada para explicar e detalhar as alocações em linguagem natural.</p>
       </div>
       <div className="bg-white p-8 rounded-[28px] border border-gray-100 shadow-sm space-y-3">
         <div className="flex items-center gap-3 text-rose-500 font-black uppercase text-[11px] tracking-[0.3em]">
@@ -1085,3 +1471,9 @@ export default function App() {
     </Router>
   );
 }
+
+
+
+
+
+
