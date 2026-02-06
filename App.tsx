@@ -1510,12 +1510,128 @@ const GlossaryPage = () => (
   </div>
 );
 
+const ConfigPage = () => {
+  const normalizeModel = (provider: LLMProvider, model: string) => {
+    if (provider === 'Google AI Studio (Gemini)') {
+      if (model === 'gemini-2.5-flash-latest') return 'gemini-2.5-flash';
+      if (model === 'gemini-2.5-pro-latest') return 'gemini-2.5-pro';
+    }
+    return model;
+  };
+
+  const [config, setConfig] = useState<AIConfig>(() => {
+    const saved = localStorage.getItem('reserveAdvisor:aiConfig');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...parsed, model: normalizeModel(parsed.provider, parsed.model) };
+    }
+    return DEFAULT_AI_CONFIG;
+  });
+  const [userLevel, setUserLevel] = useState<UserLevel>(() => {
+    try { return loadUserLevel(); } catch { return 'intermediario'; }
+  });
+
+  const handleProviderChange = (provider: LLMProvider) => {
+    const defaultConfig = AVAILABLE_MODELS[provider][0];
+    setConfig(prev => ({ ...prev, provider, model: normalizeModel(provider, defaultConfig.id) }));
+  };
+
+  useEffect(() => {
+    localStorage.setItem('reserveAdvisor:aiConfig', JSON.stringify(config));
+  }, [config]);
+
+  useEffect(() => {
+    try { saveUserLevel(userLevel); } catch {}
+  }, [userLevel]);
+
+  return (
+    <div className="max-w-5xl mx-auto py-12 px-6 space-y-10">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-4xl font-black text-[#0d3b4c] uppercase tracking-tight">Configuração AI</h1>
+          <p className="text-sm text-gray-500">Gerencie chave, provedor, modelo e nível de linguagem.</p>
+        </div>
+        <div className="flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600">
+          <span className="px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700">Status: {config.apiKey ? 'Ativo' : 'Requerido'}</span>
+          <span className="px-3 py-1 rounded-xl bg-gray-50 border border-gray-100 text-gray-600">{config.provider}</span>
+          <span className="px-3 py-1 rounded-xl bg-white border border-gray-100 text-gray-500">{config.model}</span>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="space-y-4 p-6 bg-white rounded-[28px] border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between">
+            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+              <LockKeyhole size={12}/> Autenticação (API Key)
+            </label>
+            <span className={`text-[9px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest ${config.apiKey ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30' : 'bg-red-500/10 text-red-600 border border-red-500/30'}`}>
+              {config.apiKey ? 'Ativo' : 'Requerido'}
+            </span>
+          </div>
+          <p className="text-[11px] text-gray-500 leading-relaxed font-medium">Insira sua chave de API para o provedor selecionado.</p>
+          <input type="password" value={config.apiKey} onChange={e => setConfig({...config, apiKey: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-sm" placeholder="Cole sua API Key aqui" />
+        </div>
+
+        <div className="space-y-4 p-6 bg-white rounded-[28px] border border-gray-100 shadow-sm">
+          <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Provedor de IA</label>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {AVAILABLE_PROVIDERS.map(p => (
+              <button key={p} onClick={() => handleProviderChange(p)} className={`w-full text-left p-4 rounded-xl border-2 transition-all ${config.provider === p ? 'bg-emerald-50 border-emerald-400 text-emerald-700' : 'bg-gray-50 border-gray-100 text-gray-600 hover:border-emerald-200'}`}>
+                <div className="text-[11px] font-black uppercase">{p}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4 p-6 bg-white rounded-[28px] border border-gray-100 shadow-sm">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Engine de inteligência</label>
+        <div className="grid md:grid-cols-2 gap-3">
+          {AVAILABLE_MODELS[config.provider].map(m => (
+            <button key={m.id} onClick={() => setConfig({ ...config, model: m.id })} className={`w-full text-left p-6 rounded-2xl border-2 transition-all flex justify-between items-center ${config.model === m.id ? 'bg-emerald-50 border-emerald-400 text-emerald-700' : 'bg-gray-50 border-gray-100 text-gray-600 hover:border-emerald-200'}`}>
+              <div className="flex items-center gap-4">
+                 <div className={`w-3 h-3 rounded-full ${config.model === m.id ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                 <div>
+                    <div className={`text-[11px] font-black uppercase ${config.model === m.id ? 'text-[#0d3b4c]' : ''}`}>{m.name}</div>
+                    <div className="text-[9px] mt-1 opacity-70 font-bold">{m.desc}</div>
+                 </div>
+              </div>
+              {config.model === m.id && <Sparkles size={16} className="text-emerald-500" />}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-4 p-6 bg-white rounded-[28px] border border-gray-100 shadow-sm">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Nível do usuário</label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {[
+            { id: 'iniciante', label: 'Iniciante' },
+            { id: 'intermediario', label: 'Intermediário' },
+            { id: 'avancado', label: 'Avançado' },
+          ].map(level => (
+            <button
+              key={level.id}
+              onClick={() => setUserLevel(level.id as UserLevel)}
+              className={`px-3 py-3 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${userLevel === level.id ? 'bg-emerald-50 border-emerald-400 text-emerald-700' : 'bg-gray-50 border-gray-100 text-gray-600 hover:border-emerald-200'}`}
+            >
+              {level.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-[11px] text-gray-500 font-medium leading-relaxed">Mais explicação para iniciantes, mais dados para avançados. Mesmo cuidado legal.</p>
+      </div>
+
+      <div className="flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-widest text-gray-500">
+        <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-xl border border-gray-200 hover:border-emerald-200 hover:text-emerald-600 flex items-center gap-2">
+          <Info size={12}/> Documentação de Faturamento e Cotas
+        </a>
+      </div>
+    </div>
+  );
+};
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const handleOpenConfig = () => {
-    window.dispatchEvent(new CustomEvent('openConfigPanel'));
-  };
 
   useEffect(() => {
     if (window.innerWidth >= 1024) setMenuOpen(true);
@@ -1544,7 +1660,7 @@ export default function App() {
               <Link to="/glossary" className="block px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10">Glossário</Link>
             </nav>
             <div className="border-t border-white/10 pt-4 space-y-3">
-              <button onClick={handleOpenConfig} className="w-full px-4 py-4 rounded-2xl bg-emerald-500/20 border border-emerald-400 text-emerald-50 font-black uppercase text-xs tracking-widest hover:bg-emerald-500/30">Configuração AI</button>
+              <Link to="/config" className="block text-center px-4 py-4 rounded-2xl bg-emerald-500/20 border border-emerald-400 text-emerald-50 font-black uppercase text-xs tracking-widest hover:bg-emerald-500/30">Configuração AI</Link>
               <p className="text-[11px] text-gray-400">Acesse provedores, modelos e nível de linguagem (iniciante/intermediário/avançado).</p>
             </div>
           </div>
@@ -1566,6 +1682,7 @@ export default function App() {
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/how-it-works" element={<HowItWorksPage />} />
               <Route path="/glossary" element={<GlossaryPage />} />
+              <Route path="/config" element={<ConfigPage />} />
             </Routes>
           </main>
           <Link to="/chat" className="fixed bottom-10 right-10 w-24 h-24 bg-emerald-500 text-white rounded-[40px] flex items-center justify-center shadow-2xl hover:scale-110 transition-all z-[100] border-8 border-white group">
