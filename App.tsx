@@ -211,7 +211,7 @@ const Header = () => {
           <div className="relative">
             <button 
               onClick={() => setShowConfig(!showConfig)}
-              className={`p-2 px-4 border rounded-xl transition-all group flex items-center gap-3 ${showConfig ? 'bg-emerald-500/20 border-emerald-500' : 'bg-[#05141a] border-[#0d1a1f] hover:border-emerald-500/50'}`}
+              className={`p-2 px-4 border rounded-xl transition-all group flex items-center gap-3 ${showConfig ? 'bg-emerald-500/20 border-emerald-500' : 'bg-[#05141a] border-[#0d1a1f] hover:border-emerald-500/50'} focus:outline-none focus:ring-2 focus:ring-emerald-500/60`}
             >
               <div className="flex flex-col items-end">
                 <span className="text-[8px] font-black uppercase text-gray-500 tracking-tighter">Configuração</span>
@@ -223,7 +223,7 @@ const Header = () => {
               <ChevronDown size={12} className={`transition-transform text-emerald-400/50 ${showConfig ? 'rotate-180' : ''}`} />
             </button>
             {showConfig && (
-              <div className="absolute top-full right-0 mt-4 w-[420px] bg-[#0c1418] backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-2xl p-10 z-[100] animate-in fade-in slide-in-from-top-6 duration-300">
+              <div className="absolute top-full right-0 mt-4 w-full max-w-[420px] bg-[#0c1418] backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-8 z-[100] animate-in fade-in slide-in-from-top-6 duration-300 max-h-[88vh] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-500/40 scrollbar-track-white/5">
                 <div className="space-y-10">
                    <div className="flex justify-between items-center">
                       <div className="flex items-center gap-3 text-emerald-400">
@@ -247,9 +247,9 @@ const Header = () => {
                       </div>
                    </div>
 
-                   <div className="space-y-6 pt-4 border-t border-white/5">
+                  <div className="space-y-6 pt-4 border-t border-white/5">
                       <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Provedor de IA</label>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {AVAILABLE_PROVIDERS.map(p => (
                           <button key={p} onClick={() => handleProviderChange(p)} className={`w-full text-left p-4 rounded-xl border-2 transition-all ${config.provider === p ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'bg-white/5 border-transparent text-gray-500 hover:bg-white/10'}`}>
                             <div className="text-[10px] font-black uppercase">{p}</div>
@@ -258,7 +258,7 @@ const Header = () => {
                       </div>
                    </div>
 
-                   <div className="space-y-6 pt-4 border-t border-white/5">
+                  <div className="space-y-6 pt-4 border-t border-white/5">
                       <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Engine de inteligência</label>
                       <div className="grid grid-cols-1 gap-3">
                         {AVAILABLE_MODELS[config.provider].map(m => (
@@ -276,9 +276,9 @@ const Header = () => {
                       </div>
                    </div>
 
-                   <div className="space-y-6 pt-4 border-t border-white/5">
+                  <div className="space-y-6 pt-4 border-t border-white/5">
                       <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Nível do usuário</label>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {[
                           { id: 'iniciante', label: 'Iniciante' },
                           { id: 'intermediario', label: 'Intermediário' },
