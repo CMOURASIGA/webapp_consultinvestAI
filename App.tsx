@@ -185,6 +185,12 @@ const Header = () => {
     try { saveUserLevel(userLevel); } catch {}
   }, [userLevel]);
 
+  useEffect(() => {
+    const handler = () => setShowConfig(true);
+    window.addEventListener('openConfigPanel', handler);
+    return () => window.removeEventListener('openConfigPanel', handler);
+  }, []);
+
   const handleProviderChange = (provider: LLMProvider) => {
     const defaultConfig = AVAILABLE_MODELS[provider][0];
     setConfig({ ...config, provider, model: normalizeModel(provider, defaultConfig.id) });
@@ -1505,25 +1511,67 @@ const GlossaryPage = () => (
 );
 
 export default function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleOpenConfig = () => {
+    window.dispatchEvent(new CustomEvent('openConfigPanel'));
+  };
+
+  useEffect(() => {
+    if (window.innerWidth >= 1024) setMenuOpen(true);
+  }, []);
+
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-[#fcfdfe]">
-        <Header />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/wizard" element={<WizardPage />} />
-            <Route path="/results/:simulationId" element={<ResultsPage />} />
-            <Route path="/history" element={<HistoryPage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/glossary" element={<GlossaryPage />} />
-          </Routes>
-        </main>
-        <Link to="/chat" className="fixed bottom-10 right-10 w-24 h-24 bg-emerald-500 text-white rounded-[40px] flex items-center justify-center shadow-2xl hover:scale-110 transition-all z-[100] border-8 border-white group">
-           <MessageSquare size={36} className="group-hover:rotate-12 transition-transform" />
-        </Link>
+      <div className="min-h-screen flex bg-[#fcfdfe]">
+        {/* Sidebar */}
+        <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#081116] text-white border-r border-white/10 shadow-2xl transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+          <div className="p-6 space-y-6 overflow-y-auto h-full scrollbar-thin scrollbar-thumb-emerald-500/40 scrollbar-track-white/5">
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-3 font-bold text-lg uppercase tracking-widest">
+                <ShieldCheck className="text-emerald-400" /> Reserve Advisor
+              </Link>
+              <button onClick={() => setMenuOpen(false)} className="lg:hidden p-2 rounded-lg hover:bg-white/5">
+                <X size={18} />
+              </button>
+            </div>
+            <nav className="space-y-2 text-sm font-semibold">
+              <Link to="/chat" className="block px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10">Conversar</Link>
+              <Link to="/dashboard" className="block px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10">Panorama</Link>
+              <Link to="/wizard" className="block px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10">Simular</Link>
+              <Link to="/history" className="block px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10">Histórico</Link>
+              <Link to="/how-it-works" className="block px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10">Como Funciona</Link>
+              <Link to="/glossary" className="block px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10">Glossário</Link>
+            </nav>
+            <div className="border-t border-white/10 pt-4 space-y-3">
+              <button onClick={handleOpenConfig} className="w-full px-4 py-4 rounded-2xl bg-emerald-500/20 border border-emerald-400 text-emerald-50 font-black uppercase text-xs tracking-widest hover:bg-emerald-500/30">Configuração AI</button>
+              <p className="text-[11px] text-gray-400">Acesse provedores, modelos e nível de linguagem (iniciante/intermediário/avançado).</p>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main layout */}
+        <div className="flex-1 flex flex-col" style={{ paddingLeft: menuOpen ? '18rem' : '0' }}>
+          <Header />
+          <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden fixed top-24 left-4 z-40 p-3 rounded-2xl bg-[#0d3b4c] text-white shadow-xl border border-white/10">
+            <LayoutDashboard size={18} />
+          </button>
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/wizard" element={<WizardPage />} />
+              <Route path="/results/:simulationId" element={<ResultsPage />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/glossary" element={<GlossaryPage />} />
+            </Routes>
+          </main>
+          <Link to="/chat" className="fixed bottom-10 right-10 w-24 h-24 bg-emerald-500 text-white rounded-[40px] flex items-center justify-center shadow-2xl hover:scale-110 transition-all z-[100] border-8 border-white group">
+             <MessageSquare size={36} className="group-hover:rotate-12 transition-transform" />
+          </Link>
+        </div>
       </div>
     </Router>
   );
